@@ -1,6 +1,6 @@
 "use client";
 
-import { useSocket } from "@/contexts/UserContext";
+import { useSocket } from "@/contexts/SocketContext";
 import { useRouter } from "next/navigation";
 import { ReactElement, useRef, useState } from "react";
 

@@ -1,6 +1,6 @@
 "use client";
 import Overlay from "@/components/Overlay";
-import { useSocket } from "@/contexts/UserContext";
+import { useSocket } from "@/contexts/SocketContext";
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useEffect, useRef } from "react";
 import { toast } from "sonner";

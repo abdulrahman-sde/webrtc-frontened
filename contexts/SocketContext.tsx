@@ -12,8 +12,9 @@ export default function SocketContextProvider({
   children: React.ReactNode;
 }) {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   useEffect(() => {
-    const socketInstance = io("http://localhost:4000");
+    const socketInstance = io(baseUrl);
     setSocket(socketInstance);
     return () => {
       socket?.disconnect();
