@@ -149,26 +149,53 @@ export default function Room() {
     };
   }, [socket]);
   return (
-    <div className="relative group flex  justify-center items-center gap-4  h-screen">
-      <div className="relative w-100 h-70 overflow-hidden rounded-lg bg-slate-950 ring-1 ring-white/10 shadow-2xl">
+    <div className="relative h-screen w-full bg-slate-950 flex flex-col md:flex-row items-center justify-center p-4 gap-4 overflow-hidden">
+      {/* Remote Video (The "Main" View) */}
+      <div className="relative w-full h-full md:flex-1 max-w-5xl aspect-video md:aspect-auto rounded-2xl overflow-hidden bg-slate-900 ring-1 ring-white/10 shadow-2xl">
+        <video
+          ref={remoteVideoRef}
+          autoPlay
+          playsInline
+          className="w-full h-full object-cover"
+        />
+        {/* Remote Label */}
+        <div className="absolute bottom-4 left-4 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full text-white text-sm">
+          {remoteEmailRef.current || "Waiting for user..."}
+        </div>
+      </div>
+
+      {/* Local Video (Floating on Mobile, Side-bar on Desktop) */}
+      <div className="absolute top-6 right-6 w-32 h-48 md:relative md:top-0 md:right-0 md:w-72 md:h-fit rounded-xl overflow-hidden shadow-2xl ring-2 ring-white/20 z-10 transition-all duration-300">
         <video
           ref={localVideoRef}
           autoPlay
           playsInline
           muted
-          className="w-full h-auto  object-cover brightness-95 group-hover:brightness-100 transition-all duration-500"
+          className="w-full h-full object-cover scale-x-[-1]" // Mirrored for natural feel
         />
-
-        <Overlay email={email} />
+        {/* <div className="absolute bottom-2 left-2">
+          <Overlay email={email} />
+        </div> */}
       </div>
-      <div className="relative w-100 h-70 overflow-hidden rounded-lg bg-slate-950 ring-1 ring-white/10 shadow-2xl">
-        <video
-          ref={remoteVideoRef}
-          autoPlay
-          playsInline
-          className="w-full h-auto  object-cover brightness-95 group-hover:brightness-100 transition-all duration-500"
-        />
-        {/* <Overlay email={remoteEmailRef} />" */}
+
+      {/* Mobile Call Controls (Optional Add-on) */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 z-20">
+        {/* <button className="p-4 bg-red-600 hover:bg-red-700 rounded-full text-white shadow-lg transition-all">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path>
+            <line x1="23" y1="1" x2="1" y2="23"></line>
+          </svg>
+        </button> */}
       </div>
     </div>
   );
