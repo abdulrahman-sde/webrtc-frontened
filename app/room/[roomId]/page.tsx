@@ -1,8 +1,7 @@
 "use client";
-import Overlay from "@/components/Overlay";
 import { useSocket } from "@/contexts/SocketContext";
 import { useParams, useSearchParams } from "next/navigation";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 export default function Room() {
@@ -18,11 +17,25 @@ export default function Room() {
   const remoteEmailRef = useRef<string | null>(null);
 
   const createPeerConnection = () => {
-    // STUN server helps finding public IP
+    // STUN server helps finding public IP. TURN servers (relay) are required
+    // when peers are behind symmetric NATs or firewalls. Provide TURN
+    // credentials via environment variables in production:
+    // NEXT_PUBLIC_TURN_URL, NEXT_PUBLIC_TURN_USERNAME, NEXT_PUBLIC_TURN_CREDENTIAL
+    const turnUrl = process.env.NEXT_PUBLIC_TURN_URL || "TURN_HOST";
+    const turnUsername = process.env.NEXT_PUBLIC_TURN_USERNAME || "TURN_USER";
+    const turnCredential =
+      process.env.NEXT_PUBLIC_TURN_CREDENTIAL || "TURN_PASS";
 
-    const configuration = {
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    const configuration: RTCConfiguration = {
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun2.l.google.com:19302" },
+        { urls: "stun:stun3.l.google.com:19302" },
+        { urls: "stun:stun4.l.google.com:19302" },
+      ],
     };
+
     const pc = new RTCPeerConnection(configuration);
 
     localStreamRef.current?.getTracks().forEach((track) => {
@@ -37,6 +50,10 @@ export default function Room() {
     };
 
     pc.onicecandidate = (event) => {
+      console.log(
+        "ICE candidate event:",
+        event.candidate?.candidate ?? "(null)"
+      );
       if (event.candidate && remoteEmailRef) {
         socket?.emit("ice-candidate", {
           candidate: event.candidate,
@@ -45,6 +62,19 @@ export default function Room() {
         });
       }
     };
+
+    pc.addEventListener("icegatheringstatechange", () => {
+      console.log("iceGatheringState:", pc.iceGatheringState);
+    });
+
+    pc.addEventListener("iceconnectionstatechange", () => {
+      console.log(
+        "iceConnectionState:",
+        pc.iceConnectionState,
+        "connectionState:",
+        pc.connectionState
+      );
+    });
 
     return pc;
   };
